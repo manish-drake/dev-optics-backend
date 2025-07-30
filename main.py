@@ -137,6 +137,6 @@ if __name__ == "__main__":
     uvicorn.run(
         "main:app",       # "<module>:<app instance>"
         host="0.0.0.0",   # or "127.0.0.1"
-        port=8000,        # your chosen port
+        port=1337,        # your chosen port
         reload=True       # dev auto-reload
     )
