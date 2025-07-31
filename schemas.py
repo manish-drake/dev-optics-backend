@@ -23,6 +23,10 @@ class VersionBase(BaseModel):
     app: str
     dt_started: date
     description: Optional[str] = None
+    delta_maj: int
+    delta_min: int
+    delta_pat: int
+    current: bool
 
 class VersionCreate(VersionBase):
     pass
