@@ -41,6 +41,14 @@ def read_apps(skip: int=0, limit: int=100, db: Session=Depends(get_db)):
 def create_app(app_in: schemas.AppCreate, db: Session=Depends(get_db)):
     return crud.create_app(db, app_in)
 
+# Retrieve a single app by ID
+@app.get("/apps/{app_id}", response_model=schemas.App)
+def read_app(app_id: int, db: Session = Depends(get_db)):
+    db_app = crud.get_app_by_id(db, app_id)
+    if not db_app:
+        raise HTTPException(status_code=404, detail="App not found")
+    return db_app
+
 # --- Versions endpoints ---
 @app.get("/versions/", response_model=List[schemas.Version])
 def read_versions(skip: int=0, limit: int=100, db: Session=Depends(get_db)):
@@ -49,6 +57,14 @@ def read_versions(skip: int=0, limit: int=100, db: Session=Depends(get_db)):
 @app.post("/versions/", response_model=schemas.Version)
 def create_version(v_in: schemas.VersionCreate, db: Session=Depends(get_db)):
     return crud.create_version(db, v_in)
+
+# Retrieve a single version by ID
+@app.get("/versions/{version_id}", response_model=schemas.Version)
+def read_version(version_id: int, db: Session = Depends(get_db)):
+    db_version = crud.get_version_by_id(db, version_id)
+    if not db_version:
+        raise HTTPException(status_code=404, detail="Version not found")
+    return db_version
 
 # --- Deployments endpoints ---
 @app.get("/deployments/", response_model=List[schemas.Deployment])
@@ -59,6 +75,14 @@ def read_deployments(skip: int=0, limit: int=100, db: Session=Depends(get_db)):
 def create_deployment(d_in: schemas.DeploymentCreate, db: Session=Depends(get_db)):
     return crud.create_deployment(db, d_in)
 
+# Retrieve a single deployment by ID
+@app.get("/deployments/{deployment_id}", response_model=schemas.Deployment)
+def read_deployment(deployment_id: int, db: Session = Depends(get_db)):
+    db_deployment = crud.get_deployment_by_id(db, deployment_id)
+    if not db_deployment:
+        raise HTTPException(status_code=404, detail="Deployment not found")
+    return db_deployment
+
 # --- Changes endpoints ---
 @app.get("/changes/", response_model=List[schemas.Change])
 def read_changes(skip: int=0, limit: int=100, db: Session=Depends(get_db)):
@@ -67,6 +91,14 @@ def read_changes(skip: int=0, limit: int=100, db: Session=Depends(get_db)):
 @app.post("/changes/", response_model=schemas.Change)
 def create_change(c_in: schemas.ChangeCreate, db: Session=Depends(get_db)):
     return crud.create_change(db, c_in)
+
+# Retrieve a single change by ID
+@app.get("/changes/{change_id}", response_model=schemas.Change)
+def read_change(change_id: int, db: Session = Depends(get_db)):
+    db_change = crud.get_change_by_id(db, change_id)
+    if not db_change:
+        raise HTTPException(status_code=404, detail="Change not found")
+    return db_change
 
 @app.post("/changes/upload-image/", summary="Upload image for a Change")
 async def upload_change_image(file: UploadFile = File(...)):

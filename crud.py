@@ -47,6 +47,19 @@ def create_change(db: Session, ch: schemas.ChangeCreate):
     db.refresh(db_obj)
     return db_obj
 
+# --- Get by ID helpers ---
+def get_app_by_id(db: Session, app_id: int):
+    return db.query(models.App).filter(models.App.id == app_id).first()
+
+def get_version_by_id(db: Session, version_id: int):
+    return db.query(models.Version).filter(models.Version.id == version_id).first()
+
+def get_deployment_by_id(db: Session, deployment_id: int):
+    return db.query(models.Deployment).filter(models.Deployment.id == deployment_id).first()
+
+def get_change_by_id(db: Session, change_id: int):
+    return db.query(models.Change).filter(models.Change.id == change_id).first()
+
 # --- Delete operations ---
 
 def get_app(db: Session, app_id: int):
