@@ -5,11 +5,21 @@ import database, models, schemas, crud
 from fastapi import UploadFile, File
 from fastapi.staticfiles import StaticFiles
 import os, shutil
+from fastapi.middleware.cors import CORSMiddleware
 
 # create database tables
 models.Base.metadata.create_all(bind=database.engine)
 
 app = FastAPI(title="Dev-Optics API")
+
+# Configure CORS to allow the Angular frontend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:4200"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Serve uploaded images from the static directory
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -131,6 +141,36 @@ def update_deployment(deployment_id: int, dep_in: schemas.DeploymentCreate, db: 
     if not db_dep:
         raise HTTPException(status_code=404, detail="Deployment not found")
     return crud.update_deployment(db, deployment_id, dep_in)
+
+# --- Milestones endpoints ---
+@app.get("/milestones/", response_model=List[schemas.Milestone])
+def read_milestones(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    return crud.get_milestones(db, skip, limit)
+
+@app.get("/milestones/{milestone_id}", response_model=schemas.Milestone)
+def read_milestone(milestone_id: int, db: Session = Depends(get_db)):
+    db_milestone = crud.get_milestone(db, milestone_id)
+    if not db_milestone:
+        raise HTTPException(status_code=404, detail="Milestone not found")
+    return db_milestone
+
+@app.post("/milestones/", response_model=schemas.Milestone)
+def create_milestone(milestone_in: schemas.MilestoneCreate, db: Session = Depends(get_db)):
+    return crud.create_milestone(db, milestone_in)
+
+@app.delete("/milestones/{milestone_id}", status_code=204)
+def delete_milestone(milestone_id: int, db: Session = Depends(get_db)):
+    db_milestone = crud.get_milestone(db, milestone_id)
+    if not db_milestone:
+        raise HTTPException(status_code=404, detail="Milestone not found")
+    crud.delete_milestone(db, milestone_id)
+
+@app.put("/milestones/{milestone_id}", response_model=schemas.Milestone)
+def update_milestone(milestone_id: int, milestone_in: schemas.MilestoneCreate, db: Session = Depends(get_db)):
+    db_milestone = crud.get_milestone(db, milestone_id)
+    if not db_milestone:
+        raise HTTPException(status_code=404, detail="Milestone not found")
+    return crud.update_milestone(db, milestone_id, milestone_in)
 
 if __name__ == "__main__":
     import uvicorn

@@ -1,6 +1,6 @@
 from sqlalchemy import (
     Column, Integer, String, Date, DateTime,
-    Text, Enum, ForeignKey
+    Text, Enum, ForeignKey, Boolean
 )
 from sqlalchemy.dialects.sqlite import JSON
 from sqlalchemy.orm import relationship
@@ -12,6 +12,7 @@ class CategoryEnum(str, enum.Enum):
     bug = "bug"
     feature = "feature"
     refactoring = "refactoring"
+    breaking = "breaking"
 
 class App(Base):
     __tablename__ = "apps"
@@ -38,10 +39,22 @@ class Version(Base):
     deployments = relationship("Deployment", back_populates="version_obj")
     changes     = relationship("Change", back_populates="version_obj")
 
+class Milestone(Base):
+    __tablename__ = "milestones"
+    id           = Column(Integer, primary_key=True, index=True)
+    milestone    = Column(String, index=True)
+    goal         = Column(Text)
+    dt_milestone = Column(String)
+    proj_ver     = Column(String)
+    complete     = Column(Boolean)
+
+    deployments  = relationship("Deployment", back_populates="milestone_obj")
+
 class Deployment(Base):
     __tablename__ = "deployments"
     id          = Column(Integer, primary_key=True, index=True)
     dtt_deploy  = Column(DateTime)
+    milestone    = Column(String, ForeignKey("milestones.milestone"))
     app         = Column(String, ForeignKey("apps.app"))
     version     = Column(String, ForeignKey("versions.version"))
     git_tag     = Column(Text)
@@ -50,6 +63,7 @@ class Deployment(Base):
 
     app_obj     = relationship("App", back_populates="deployments")
     version_obj = relationship("Version", back_populates="deployments")
+    milestone_obj = relationship("Milestone", back_populates="deployments")
 
 class Change(Base):
     __tablename__ = "changes"

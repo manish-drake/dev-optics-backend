@@ -34,6 +34,7 @@ class Version(VersionBase):
 
 class DeploymentBase(BaseModel):
     dtt_deploy: datetime
+    milestone: str
     app: str
     version: str
     git_tag: Optional[str] = None
@@ -62,6 +63,21 @@ class ChangeCreate(ChangeBase):
     pass
 
 class Change(ChangeBase):
+    id: int
+    class Config:
+        orm_mode = True
+
+class MilestoneBase(BaseModel):
+    milestone: str
+    goal: str
+    dt_milestone: str
+    proj_ver: str
+    complete: bool
+
+class MilestoneCreate(MilestoneBase):
+    pass
+
+class Milestone(MilestoneBase):
     id: int
     class Config:
         orm_mode = True

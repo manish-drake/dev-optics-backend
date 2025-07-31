@@ -128,3 +128,36 @@ def update_change(db: Session, change_id: int, change_in: schemas.ChangeCreate):
     db.commit()
     db.refresh(db_obj)
     return db_obj
+
+
+# --- Milestones CRUD ---
+
+def get_milestones(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.Milestone).offset(skip).limit(limit).all()
+
+def create_milestone(db: Session, milestone_in: schemas.MilestoneCreate):
+    db_obj = models.Milestone(**milestone_in.dict())
+    db.add(db_obj)
+    db.commit()
+    db.refresh(db_obj)
+    return db_obj
+
+def get_milestone(db: Session, milestone_id: int):
+    return db.query(models.Milestone).filter(models.Milestone.id == milestone_id).first()
+
+def delete_milestone(db: Session, milestone_id: int):
+    db_obj = get_milestone(db, milestone_id)
+    if db_obj:
+        db.delete(db_obj)
+        db.commit()
+    return db_obj
+
+def update_milestone(db: Session, milestone_id: int, milestone_in: schemas.MilestoneCreate):
+    db_obj = get_milestone(db, milestone_id)
+    if not db_obj:
+        return None
+    for key, value in milestone_in.dict().items():
+        setattr(db_obj, key, value)
+    db.commit()
+    db.refresh(db_obj)
+    return db_obj
