@@ -15,7 +15,7 @@ app = FastAPI(title="Dev-Optics API")
 # Configure CORS to allow the Angular frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:*"],
+    allow_origins=["http://localhost"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
