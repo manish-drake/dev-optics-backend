@@ -34,6 +34,10 @@ class Version(Base):
     app         = Column(String, ForeignKey("apps.app"))
     dt_started  = Column(Date)
     description = Column(Text)
+    delta_maj   = Column(Integer)
+    delta_min   = Column(Integer)
+    delta_pat   = Column(Integer)
+    current     = Column(Boolean)
 
     app_obj     = relationship("App", back_populates="versions")
     deployments = relationship("Deployment", back_populates="version_obj")
