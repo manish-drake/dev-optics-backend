@@ -9,6 +9,7 @@ import enum
 from database import Base
 
 class CategoryEnum(str, enum.Enum):
+    tweaks = "tweaks"
     bug = "bug"
     feature = "feature"
     refactoring = "refactoring"
