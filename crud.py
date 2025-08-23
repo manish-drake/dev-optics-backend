@@ -65,6 +65,10 @@ def get_app_by_id(db: Session, app_id: int):
 def get_version_by_id(db: Session, version_id: int):
     return db.query(models.Version).filter(models.Version.id == version_id).first()
 
+# Get version by semver
+def get_version_by_semver(db: Session, semver: str):
+    return db.query(models.Version).filter(models.Version.semver == semver).first()
+
 def get_deployment_by_id(db: Session, deployment_id: int):
     return db.query(models.Deployment).filter(models.Deployment.id == deployment_id).first()
 
