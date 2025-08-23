@@ -92,6 +92,11 @@ def read_changes(skip: int=0, limit: int=100, db: Session=Depends(get_db)):
 def create_change(c_in: schemas.ChangeCreate, db: Session=Depends(get_db)):
     return crud.create_change(db, c_in)
 
+# Retrieve all changes for a given version
+@app.get("/versions/{version_id}/changes/", response_model=List[schemas.Change])
+def read_changes_by_version(version_id: int, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    return crud.get_changes_by_version(db, version_id, skip, limit)
+
 # Retrieve a single change by ID
 @app.get("/changes/{change_id}", response_model=schemas.Change)
 def read_change(change_id: int, db: Session = Depends(get_db)):

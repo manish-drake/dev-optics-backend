@@ -40,12 +40,23 @@ def create_deployment(db: Session, dep: schemas.DeploymentCreate):
 def get_changes(db: Session, skip=0, limit=100):
     return db.query(models.Change).offset(skip).limit(limit).all()
 
+
 def create_change(db: Session, ch: schemas.ChangeCreate):
     db_obj = models.Change(**ch.dict())
     db.add(db_obj)
     db.commit()
     db.refresh(db_obj)
     return db_obj
+
+# Fetch changes by version_id with pagination
+def get_changes_by_version(db: Session, version_id: int, skip: int = 0, limit: int = 100):
+    return (
+        db.query(models.Change)
+        .filter(models.Change.version_id == version_id)
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
 
 # --- Get by ID helpers ---
 def get_app_by_id(db: Session, app_id: int):
