@@ -49,10 +49,10 @@ def create_change(db: Session, ch: schemas.ChangeCreate):
     return db_obj
 
 # Fetch changes by version_id with pagination
-def get_changes_by_version(db: Session, version_id: int, skip: int = 0, limit: int = 100):
+def get_app_changes_by_version(db: Session, app:str, version: str, skip: int = 0, limit: int = 100):
     return (
         db.query(models.Change)
-        .filter(models.Change.version_id == version_id)
+        .filter(models.Change.version == version & models.Change.app == app)
         .offset(skip)
         .limit(limit)
         .all()
@@ -67,7 +67,7 @@ def get_version_by_id(db: Session, version_id: int):
 
 # Get version by semver
 def get_version_by_semver(db: Session, semver: str):
-    return db.query(models.Version).filter(models.Version.semver == semver).first()
+    return db.query(models.Version).filter(models.Version.version == semver).first()
 
 def get_deployment_by_id(db: Session, deployment_id: int):
     return db.query(models.Deployment).filter(models.Deployment.id == deployment_id).first()
