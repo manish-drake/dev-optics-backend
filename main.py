@@ -99,7 +99,7 @@ def read_changes_by_version(version_id: int, skip: int = 0, limit: int = 100, db
     return crud.get_changes_by_version(db, version_id, skip, limit)
 
 # Retrieve all changes for a given version by semantic version string
-@app.get("apps/{app}/versions/{version}/changes/", response_model=List[schemas.Change])
+@app.get("/apps/{app}/versions/{version}/changes/", response_model=List[schemas.Change])
 def read_app_changes_by_version(app:str, version: str, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return crud.get_app_changes_by_version(db, app, version, skip, limit)
 
