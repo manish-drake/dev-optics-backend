@@ -52,7 +52,7 @@ def create_change(db: Session, ch: schemas.ChangeCreate):
 def get_app_changes_by_version(db: Session, app:str, version: str, skip: int = 0, limit: int = 100):
     return (
         db.query(models.Change)
-        .filter(models.Change.version == version & models.Change.app == app)
+        .filter(models.Change.version == version and models.Change.app == app)
         .offset(skip)
         .limit(limit)
         .all()
