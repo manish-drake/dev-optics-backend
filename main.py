@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 import database, models, schemas, crud
@@ -85,8 +85,8 @@ def read_deployment(deployment_id: int, db: Session = Depends(get_db)):
 
 # --- Changes endpoints ---
 @app.get("/changes/", response_model=List[schemas.Change])
-def read_changes(skip: int=0, limit: int=100, db: Session=Depends(get_db)):
-    return crud.get_changes(db, skip, limit)
+def read_changes(skip: int=0, limit: int=100, archived: Optional[bool] = None, db: Session=Depends(get_db)):
+    return crud.get_changes(db, skip, limit, archived)
 
 @app.post("/changes/", response_model=schemas.Change)
 def create_change(c_in: schemas.ChangeCreate, db: Session=Depends(get_db)):
@@ -100,8 +100,15 @@ def read_changes_by_version(version_id: int, skip: int = 0, limit: int = 100, db
 
 # Retrieve all changes for a given version by semantic version string
 @app.get("/apps/{app}/versions/{version}/changes/", response_model=List[schemas.Change])
-def read_app_changes_by_version(app:str, version: str, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    return crud.get_app_changes_by_version(db, app, version, skip, limit)
+def read_app_changes_by_version(
+    app: str,
+    version: str,
+    skip: int = 0,
+    limit: int = 100,
+    archived: Optional[bool] = None,
+    db: Session = Depends(get_db),
+):
+    return crud.get_app_changes_by_version(db, app, version, skip, limit, archived)
 
 # Retrieve a single change by ID
 @app.get("/changes/{change_id}", response_model=schemas.Change)

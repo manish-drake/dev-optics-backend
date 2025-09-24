@@ -68,6 +68,8 @@ class ChangeCreate(ChangeBase):
 
 class Change(ChangeBase):
     id: int
+    archived: bool
+    archived_at: Optional[datetime] = None
     class Config:
         orm_mode = True
 

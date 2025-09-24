@@ -81,6 +81,8 @@ class Change(Base):
     category     = Column(Enum(CategoryEnum))
     dev          = Column(Text)
     image_url    = Column(Text)
+    archived     = Column(Boolean, nullable=False, default=False, server_default="0")
+    archived_at  = Column(DateTime)
 
     app_obj      = relationship("App", back_populates="changes")
     version_obj  = relationship("Version", back_populates="changes")
