@@ -22,6 +22,14 @@ def get_versions(db: Session, skip=0, limit=100):
     return db.query(models.Version).offset(skip).limit(limit).all()
 
 def create_version(db: Session, version: schemas.VersionCreate):
+    if version.current:
+        existing_current = (
+            db.query(models.Version)
+            .filter(models.Version.app == version.app, models.Version.current.is_(True))
+            .first()
+        )
+        if existing_current:
+            raise ValueError("A current version already exists for this app; deactivate it before adding another current version.")
     db_obj = models.Version(**version.dict())
     db.add(db_obj)
     db.commit()

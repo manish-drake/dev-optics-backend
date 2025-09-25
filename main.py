@@ -56,7 +56,10 @@ def read_versions(skip: int=0, limit: int=100, db: Session=Depends(get_db)):
 
 @app.post("/versions/", response_model=schemas.Version)
 def create_version(v_in: schemas.VersionCreate, db: Session=Depends(get_db)):
-    return crud.create_version(db, v_in)
+    try:
+        return crud.create_version(db, v_in)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
 
 # Retrieve a single version by ID
 @app.get("/versions/{version_id}", response_model=schemas.Version)
