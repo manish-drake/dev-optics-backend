@@ -88,12 +88,33 @@ def read_deployment(deployment_id: int, db: Session = Depends(get_db)):
 
 # --- Changes endpoints ---
 @app.get("/changes/", response_model=List[schemas.Change])
-def read_changes(skip: int=0, limit: int=100, archived: Optional[bool] = None, db: Session=Depends(get_db)):
-    return crud.get_changes(db, skip, limit, archived)
+def read_changes(
+    skip: int = 0,
+    limit: int = 100,
+    archived: Optional[bool] = None,
+    current_only: Optional[bool] = None,
+    app: Optional[str] = None,
+    version: Optional[str] = None,
+    db: Session = Depends(get_db),
+):
+    return crud.get_changes(
+        db,
+        skip=skip,
+        limit=limit,
+        archived=archived,
+        current_only=current_only,
+        app=app,
+        version=version,
+    )
 
 @app.post("/changes/", response_model=schemas.Change)
 def create_change(c_in: schemas.ChangeCreate, db: Session=Depends(get_db)):
     return crud.create_change(db, c_in)
+
+
+@app.get("/changes/filter-options", response_model=List[schemas.ChangeFilterOption])
+def read_change_filter_options(db: Session = Depends(get_db)):
+    return crud.get_change_filter_options(db)
 
 
 # Retrieve all changes for a given version

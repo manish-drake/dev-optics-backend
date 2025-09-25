@@ -73,6 +73,13 @@ class Change(ChangeBase):
     class Config:
         orm_mode = True
 
+
+class ChangeFilterOption(BaseModel):
+    label: str
+    type: str
+    app: Optional[str] = None
+    version: Optional[str] = None
+
 class MilestoneBase(BaseModel):
     milestone: str
     goal: str

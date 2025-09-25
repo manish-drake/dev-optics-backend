@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
+from sqlalchemy import and_
 from sqlalchemy.orm import Session
 import models, schemas
 
@@ -60,10 +61,30 @@ def create_deployment(db: Session, dep: schemas.DeploymentCreate):
     return db_obj
 
 # --- Changes ---
-def get_changes(db: Session, skip=0, limit=100, archived: Optional[bool] = None):
+def get_changes(
+    db: Session,
+    skip: int = 0,
+    limit: int = 100,
+    archived: Optional[bool] = None,
+    current_only: Optional[bool] = None,
+    app: Optional[str] = None,
+    version: Optional[str] = None,
+):
     query = db.query(models.Change)
     if archived is not None:
         query = query.filter(models.Change.archived == archived)
+    if app:
+        query = query.filter(models.Change.app == app)
+    if version:
+        query = query.filter(models.Change.version == version)
+    if current_only:
+        query = query.join(
+            models.Version,
+            and_(
+                models.Change.app == models.Version.app,
+                models.Change.version == models.Version.version,
+            ),
+        ).filter(models.Version.current.is_(True))
     return query.offset(skip).limit(limit).all()
 
 
@@ -73,6 +94,29 @@ def create_change(db: Session, ch: schemas.ChangeCreate):
     db.commit()
     db.refresh(db_obj)
     return db_obj
+
+# Filter dropdown support
+def get_change_filter_options(db: Session):
+    options = [
+        schemas.ChangeFilterOption(label="<current>", type="current"),
+    ]
+    version_rows = (
+        db.query(models.Version.app, models.Version.version)
+        .distinct()
+        .order_by(models.Version.app, models.Version.version)
+        .all()
+    )
+    for app, version in version_rows:
+        options.append(
+            schemas.ChangeFilterOption(
+                label=f"{app}:{version}",
+                type="version",
+                app=app,
+                version=version,
+            )
+        )
+    options.append(schemas.ChangeFilterOption(label="<all>", type="all"))
+    return options
 
 # Fetch changes by version_id with pagination
 def get_app_changes_by_version(
