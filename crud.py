@@ -43,8 +43,20 @@ def get_deployments(db: Session, skip=0, limit=100):
 def create_deployment(db: Session, dep: schemas.DeploymentCreate):
     db_obj = models.Deployment(**dep.dict())
     db.add(db_obj)
+    version_obj = (
+        db.query(models.Version)
+        .filter(
+            models.Version.app == dep.app,
+            models.Version.version == dep.version,
+        )
+        .first()
+    )
+    if version_obj and version_obj.current:
+        version_obj.current = False
     db.commit()
     db.refresh(db_obj)
+    if version_obj:
+        db.refresh(version_obj)
     return db_obj
 
 # --- Changes ---
@@ -193,9 +205,7 @@ def archive_changes_for_milestone(db: Session, milestone_name: str) -> int:
 
     total_archived = 0
     archive_time = datetime.utcnow()
-    version_pairs = set()
     for app, version in deployments:
-        version_pairs.add((app, version))
         total_archived += (
             db.query(models.Change)
             .filter(
@@ -208,13 +218,6 @@ def archive_changes_for_milestone(db: Session, milestone_name: str) -> int:
                 synchronize_session=False,
             )
         )
-
-    for app, version in version_pairs:
-        db.query(models.Version).filter(
-            models.Version.app == app,
-            models.Version.version == version,
-            models.Version.current.is_(True),
-        ).update({"current": False}, synchronize_session=False)
     return total_archived
 
 def get_milestones(db: Session, skip: int = 0, limit: int = 100):
